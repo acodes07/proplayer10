@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -13,30 +13,17 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
-     * The primary key for the model.
-     *
-     * @var string
-     */
-    protected $primaryKey = 'user_id';
-
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     protected $fillable = [
-        'username',
+        'name',
         'email',
-        'password_hash',
-        'address',
+        'password',
+        'number',
         'role',
+        'address',
     ];
 
     /**
@@ -45,7 +32,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
-        'password_hash',
+        'password',
         'remember_token',
     ];
 
@@ -59,18 +46,26 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the password for the user.
+     * Get the records for the user (if they are a player).
      */
-    public function getAuthPassword()
+    public function records()
     {
-        return $this->password_hash;
+        return $this->hasMany(Record::class, 'player_id');
     }
 
     /**
-     * Set the password for the user.
+     * Get the players hired by this coach.
      */
-    public function setPasswordAttribute($value)
+    public function hiredPlayers()
     {
-        $this->attributes['password_hash'] = bcrypt($value);
+        return $this->hasMany(CoachPlayerRelationship::class, 'coach_id')->where('status', 'active');
+    }
+
+    /**
+     * Get the coach who hired this player.
+     */
+    public function hiredByCoach()
+    {
+        return $this->hasOne(CoachPlayerRelationship::class, 'player_id')->where('status', 'active');
     }
 }

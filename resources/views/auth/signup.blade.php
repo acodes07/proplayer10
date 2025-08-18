@@ -233,13 +233,18 @@
             @csrf
             
             <div class="form-group">
-                <label for="username" class="form-label">Username</label>
-                <input type="text" id="username" name="username" class="form-input" value="{{ old('username') }}" required placeholder="Enter your username">
+                <label for="name" class="form-label">Full Name</label>
+                <input type="text" id="name" name="name" class="form-input" value="{{ old('name') }}" required placeholder="Enter your full name">
             </div>
             
             <div class="form-group">
                 <label for="email" class="form-label">Email Address</label>
                 <input type="email" id="email" name="email" class="form-input" value="{{ old('email') }}" required placeholder="Enter your email address">
+            </div>
+            
+            <div class="form-group">
+                <label for="number" class="form-label">Phone Number</label>
+                <input type="text" id="number" name="number" class="form-input" value="{{ old('number') }}" required placeholder="Enter your phone number">
             </div>
             
             <div class="form-group">

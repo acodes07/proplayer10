@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use App\Models\Record;
 
 class PlayerProfileController extends Controller
 {
@@ -12,60 +12,73 @@ class PlayerProfileController extends Controller
     public function edit()
     {
         $user = Auth::user();
-        // Allow if role is 'player' or NULL (assuming NULL means player)
-        if ($user->role !== 'player' && $user->role !== null) {
-            abort(403, 'Unauthorized action.');
+        
+        // Ensure only players can access this
+        if ($user->role !== 'player') {
+            abort(403, 'Unauthorized action. Only players can edit their profile.');
         }
-        $player = DB::table('players')->where('full_name', $user->username)->first();
-        return view('player.edit', compact('player'));
+        
+        return view('player.edit', compact('user'));
     }
 
     // Update the player's profile
     public function update(Request $request)
     {
         $user = Auth::user();
-        // Allow if role is 'player' or NULL (assuming NULL means player)
-        if ($user->role !== 'player' && $user->role !== null) {
-            abort(403, 'Unauthorized action.');
+        
+        // Ensure only players can access this
+        if ($user->role !== 'player') {
+            abort(403, 'Unauthorized action. Only players can edit their profile.');
         }
+        
         $validated = $request->validate([
-            'full_name' => 'required|string|max:100',
-            'date_of_birth' => 'required|date',
-            'nationality' => 'required|string|max:50',
-            'position' => 'required|string|max:50',
-            'height_cm' => 'required|integer|min:100|max:250',
-            'weight_kg' => 'required|integer|min:30|max:200',
-            'preferred_foot' => 'required|in:Left,Right,Both',
+            'name' => 'required|string|max:100',
+            'number' => 'required|string|max:20',
+            'address' => 'required|string|max:255',
         ]);
-        // Update or insert
-        DB::table('players')->updateOrInsert(
-            ['full_name' => $user->username],
-            $validated
-        );
-        return redirect()->route('dashboard')->with('success', 'Your profile has been updated!');
+        
+        // Update the user's information in the database
+        $user->update($validated);
+        
+        return redirect()->route('player.dashboard')->with('success', 'Your profile has been updated successfully!');
     }
 
     // Show the player's profile (read-only)
     public function show()
     {
         $user = Auth::user();
-        // Allow if role is 'player' or NULL (assuming NULL means player)
-        if ($user->role !== 'player' && $user->role !== null) {
-            abort(403, 'Unauthorized action.');
+        
+        // Ensure only players can access this
+        if ($user->role !== 'player') {
+            abort(403, 'Unauthorized action. Only players can view their profile.');
         }
-        $player = DB::table('players')->where('full_name', $user->username)->first();
-        return view('player.show', compact('player'));
+        
+        // Get match records for this player
+        $records = Record::where('player_id', $user->id)->orderBy('created_at', 'desc')->get();
+        
+        return view('player.show', compact('user', 'records'));
     }
 
     // Show a player's profile by player_id (for coach/admin)
     public function showById($player_id)
     {
         $user = Auth::user();
-        $player = \DB::table('players')->where('player_id', $player_id)->first();
+        
         // Only allow coach or admin to view
         if (!in_array($user->role, ['coach', 'admin'])) {
-            abort(403, 'Unauthorized action.');
+            abort(403, 'Unauthorized action. Only coaches and admins can view player profiles.');
         }
-        return view('player.show', compact('player'));
+        
+        // Get the user by ID since we don't have a separate players table
+        $player = \App\Models\User::where('id', $player_id)->where('role', 'player')->first();
+        
+        if (!$player) {
+            abort(404, 'Player not found.');
+        }
+        
+        // Get match records for this player
+        $records = Record::where('player_id', $player->id)->orderBy('created_at', 'desc')->get();
+        
+        return view('player.show', compact('player', 'records'));
     }
 }

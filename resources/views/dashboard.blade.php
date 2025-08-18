@@ -339,7 +339,7 @@
                 </a>
                 <div class="user-menu">
                     <div class="user-info">
-                        <div class="user-name">{{ $user->username }}</div>
+                        <div class="user-name">{{ $user->name }}</div>
                         <div class="user-email">{{ $user->email }}</div>
                     </div>
                     <form method="POST" action="{{ route('logout') }}" style="display: inline;">
@@ -362,7 +362,7 @@
             @endif
             
             <div class="welcome-section">
-                <h1 class="welcome-title">Welcome back, {{ $user->username }}!</h1>
+                <h1 class="welcome-title">Welcome back, {{ $user->name }}!</h1>
                 <p class="welcome-subtitle">Manage your football talent journey with ProPlayer#10</p>
             </div>
             
@@ -372,12 +372,12 @@
                     
                     <div class="user-detail">
                         <div class="detail-label">User ID</div>
-                        <div class="detail-value">#{{ $user->user_id }}</div>
+                        <div class="detail-value">#{{ $user->id }}</div>
                     </div>
                     
                     <div class="user-detail">
                         <div class="detail-label">Username</div>
-                        <div class="detail-value">{{ $user->username }}</div>
+                        <div class="detail-value">{{ $user->name }}</div>
                     </div>
                     
                     <div class="user-detail">

@@ -36,4 +36,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/edit', [\App\Http\Controllers\PlayerProfileController::class, 'edit'])->name('player.edit');
     Route::post('/profile/edit', [\App\Http\Controllers\PlayerProfileController::class, 'update'])->name('player.update');
     Route::get('/profile/view', [\App\Http\Controllers\PlayerProfileController::class, 'show'])->name('player.show');
+    
+    // Admin management routes
+    Route::get('/admin/players', [\App\Http\Controllers\AdminDashboardController::class, 'showAllPlayers'])->name('admin.players');
+    Route::get('/admin/coaches', [\App\Http\Controllers\AdminDashboardController::class, 'showAllCoaches'])->name('admin.coaches');
+    Route::get('/admin/player/{player_id}/add-match-record', [\App\Http\Controllers\AdminDashboardController::class, 'showAddMatchRecord'])->name('admin.add-match-record');
+    Route::post('/admin/player/{player_id}/store-match-record', [\App\Http\Controllers\AdminDashboardController::class, 'storeMatchRecord'])->name('admin.store-match-record');
+    Route::delete('/admin/user/{user_id}/delete', [\App\Http\Controllers\AdminDashboardController::class, 'deleteUser'])->name('admin.delete-user');
+    
+    // Coach management routes
+    Route::get('/coach/browse-players', [\App\Http\Controllers\CoachDashboardController::class, 'browsePlayers'])->name('coach.browse-players');
+    Route::post('/coach/hire-player/{player_id}', [\App\Http\Controllers\CoachDashboardController::class, 'hirePlayer'])->name('coach.hire-player');
+    
+    // Player dashboard route
+    Route::get('/player/dashboard', [\App\Http\Controllers\PlayerDashboardController::class, 'index'])->name('player.dashboard');
 });
